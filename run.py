@@ -1,42 +1,45 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-import math
+from math import *
+from input import *
 
 xs = np.linspace(-L/2., L/2., L/dx)
 Nu = len(xs)
 A0 = kon/gamma
 dA = 0.1*A0
-Am = A0 + dA*2.0*(0.5-random.random(Nu))
-
+Am = A0 + dA*2.0*(0.5-np.random.randn(Nu))
 t = 0.0
 ub = 1.0
 ubs = [ub]
-ub2 = ub - .5
-ubs2 = [ub2]
+dt = 0.05
+#ub2 = ub - .5
+#ubs2 = [ub2]
 
 ts = [t]
-Ams = [copy(Am)]
-for i in range(10000):
+Ams = [list(Am)]
+am = list(Am)
+for i in range(1000):
 
     #force calculations
-    fx = pi*np.trapz( exp(-0.5*(xs-ub)**2.0)*(xs-ub)*Am, xs )
-    fx2 = pi*np.trapz( exp(-0.5*(xs-ub2)**2.0)*(xs-ub2)*Am, xs )
-
-    v0s = exp(-0.5*(xs-ub)**2.0/c/c)
-    v0s2 = exp(-0.5*(xs-ub2)**2.0/c/c)
-
-    Am += kon*dt - gamma*v0s*Am*dt - gamma*v0s2*Am*dt - Am*dt
+    fx = pi*np.trapz([exp(-0.5*(xsi-ub)**2.0)*(xsi-ub)*Ami for xsi,Ami in zip(xs,Am)], xs )
+    v0s = [exp(-0.5*(xsi-ub)**2.0/c/c) for xsi in xs]
+    lol = [Am,np.dot(kon*dt,np.ones(len(xs)))]
+    Am = Am +  np.dot(kon*dt,np.ones(len(xs))) -np.dot(Am,dt) - np.dot(np.dot(gamma,v0s),np.dot(Am,dt))
 
     # update position
     ub += fx*dt 
-    ubs.append(ub) 
-    ub2 += fx2*dt 
-    ubs2.append(ub2)
-
+    ubs.append(ub)
     t += dt
     ts.append(t)
 
+
+
+for i in range(len(Am)):
+    print am[i],Am[i], am[i]-Am[i]
+plt.plot(xs,Am)
+plt.show()
+'''
 ub3 = ub2+.1
 ubs3 = [ub3]
 ub4 = ub - .1
@@ -67,9 +70,11 @@ for i in range(10000):
 
     t += dt
     ts.append(t)
-
+'''
 plt.plot(ts,ubs)
-plt.plot(ts,ubs2)
-plt.plot(ts[-len(ubs3):],ubs3)
-plt.plot(ts[-len(ubs4):],ubs4)
+#plt.plot(ts,ubs2)
+#plt.plot(ts[-len(ubs3):],ubs3)
+#plt.plot(ts[-len(ubs4):],ubs4)
 plt.show()
+
+
